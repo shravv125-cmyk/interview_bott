@@ -165,6 +165,18 @@ python app.py
 
 ---
 
+# Screenshots
+Home
+<img width="1919" height="966" alt="image" src="https://github.com/user-attachments/assets/8cdf6e39-f374-48d5-a598-95748794b5ef" />
+
+Dashboard
+<img width="1919" height="973" alt="image" src="https://github.com/user-attachments/assets/fe68c26d-3957-4361-a9d2-72a609b585b9" />
+
+Mock Interview
+<img width="1919" height="964" alt="image" src="https://github.com/user-attachments/assets/f4d88bbe-7430-43d0-84c9-0099a7f409b5" />
+
+---
+
 # 🌐 Deployment
 
 Ready to deploy on:
