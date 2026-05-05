@@ -200,7 +200,7 @@ Ready to deploy on:
 
 # 👩‍💻 Author
 
-Built by **Shravani** 💙
+Built by **Shravani Kadam** 💙
 Aspiring AI / Full Stack Developer
 
 ---
