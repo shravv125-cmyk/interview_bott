@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login | AI Interview Bot</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Inter',sans-serif;
+}
+
+body{
+min-height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+padding:20px;
+background:
+radial-gradient(circle at top left,#60a5fa 0%,transparent 30%),
+radial-gradient(circle at bottom right,#2563eb 0%,transparent 30%),
+linear-gradient(135deg,#0f172a,#111827,#1e3a8a);
+overflow:hidden;
+position:relative;
+}
+
+body::before{
+content:"";
+position:absolute;
+width:320px;
+height:320px;
+background:rgba(255,255,255,0.06);
+border-radius:50%;
+top:-80px;
+right:-80px;
+filter:blur(20px);
+}
+
+body::after{
+content:"";
+position:absolute;
+width:260px;
+height:260px;
+background:rgba(255,255,255,0.05);
+border-radius:50%;
+bottom:-70px;
+left:-70px;
+filter:blur(20px);
+}
+
+.box{
+position:relative;
+z-index:2;
+width:100%;
+max-width:430px;
+padding:38px;
+border-radius:24px;
+background:rgba(255,255,255,0.96);
+box-shadow:0 20px 50px rgba(0,0,0,0.25);
+backdrop-filter:blur(10px);
+animation:fadeUp .6s ease;
+}
+
+@keyframes fadeUp{
+from{
+opacity:0;
+transform:translateY(20px);
+}
+to{
+opacity:1;
+transform:translateY(0);
+}
+}
+
+.logo{
+width:62px;
+height:62px;
+margin:0 auto 18px;
+border-radius:18px;
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:26px;
+background:linear-gradient(135deg,#2563eb,#60a5fa);
+color:white;
+font-weight:700;
+box-shadow:0 10px 20px rgba(37,99,235,0.25);
+}
+
+h2{
+text-align:center;
+font-size:28px;
+color:#0f172a;
+margin-bottom:8px;
+font-weight:700;
+}
+
+.subtitle{
+text-align:center;
+color:#64748b;
+font-size:14px;
+margin-bottom:28px;
+}
+
+.input-group{
+margin-bottom:16px;
+}
+
+label{
+display:block;
+font-size:14px;
+font-weight:600;
+margin-bottom:8px;
+color:#334155;
+}
+
+input{
+width:100%;
+padding:14px 15px;
+border:1px solid #dbeafe;
+border-radius:12px;
+font-size:15px;
+outline:none;
+transition:0.3s;
+background:#f8fafc;
+}
+
+input:focus{
+border-color:#2563eb;
+background:white;
+box-shadow:0 0 0 4px rgba(37,99,235,0.08);
+}
+
+.password-wrap{
+position:relative;
+}
+
+.toggle{
+position:absolute;
+right:14px;
+top:50%;
+transform:translateY(-50%);
+cursor:pointer;
+font-size:13px;
+font-weight:600;
+color:#2563eb;
+user-select:none;
+}
+
+.top-row{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin:6px 0 20px;
+font-size:14px;
+gap:10px;
+}
+
+.remember{
+display:flex;
+align-items:center;
+gap:8px;
+color:#475569;
+}
+
+.remember input{
+width:auto;
+}
+
+.top-row a{
+text-decoration:none;
+color:#2563eb;
+font-weight:600;
+transition:.3s;
+}
+
+.top-row a:hover{
+color:#1d4ed8;
+text-decoration:underline;
+}
+
+button{
+width:100%;
+padding:14px;
+border:none;
+border-radius:12px;
+background:linear-gradient(135deg,#2563eb,#1d4ed8);
+color:white;
+font-size:16px;
+font-weight:600;
+cursor:pointer;
+transition:0.3s;
+box-shadow:0 10px 20px rgba(37,99,235,0.22);
+}
+
+button:hover{
+transform:translateY(-2px);
+box-shadow:0 14px 24px rgba(37,99,235,0.28);
+}
+
+.bottom{
+margin-top:22px;
+text-align:center;
+font-size:14px;
+color:#64748b;
+}
+
+.bottom a{
+color:#2563eb;
+text-decoration:none;
+font-weight:700;
+}
+
+.bottom a:hover{
+text-decoration:underline;
+}
+
+.error-box{
+background:#fef2f2;
+color:#b91c1c;
+padding:12px;
+border-radius:12px;
+margin-bottom:18px;
+text-align:center;
+font-size:14px;
+font-weight:600;
+border:1px solid #fecaca;
+}
+
+@media(max-width:500px){
+.box{
+padding:28px 22px;
+border-radius:20px;
+}
+
+h2{
+font-size:24px;
+}
+
+.top-row{
+flex-direction:column;
+align-items:flex-start;
+}
+}
+</style>
+</head>
+<body>
+
+<div class="box">
+
+<div class="logo">AI</div>
+
+<h2>Welcome Back</h2>
+<p class="subtitle">Login to continue your interview preparation</p>
+
+{% if error %}
+<div class="error-box">
+{{ error }}
+</div>
+{% endif %}
+
+<form method="POST">
+
+<div class="input-group">
+<label>Email Address</label>
+<input type="email" name="email" placeholder="Enter your email" required>
+</div>
+
+<div class="input-group">
+<label>Password</label>
+
+<div class="password-wrap">
+<input type="password" name="password" id="password" placeholder="Enter your password" required>
+<span class="toggle" onclick="togglePassword()">Show</span>
+</div>
+
+</div>
+
+<div class="top-row">
+
+<label class="remember">
+<input type="checkbox">
+<span>Remember me</span>
+</label>
+
+<a href="/forgot-password">Forgot Password?</a>
+
+</div>
+
+<button type="submit">Login</button>
+
+</form>
+
+<p class="bottom">
+No account?
+<a href="/register">Create one</a>
+</p>
+
+</div>
+
+<script>
+function togglePassword(){
+
+let pass = document.getElementById("password");
+let btn = document.querySelector(".toggle");
+
+if(pass.type === "password"){
+pass.type = "text";
+btn.innerText = "Hide";
+}
+else{
+pass.type = "password";
+btn.innerText = "Show";
+}
+
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>AI Mock Interview</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Inter,Arial,sans-serif;
+}
+
+body{
+min-height:100vh;
+background:linear-gradient(135deg,#0f172a,#1e3a8a,#3b82f6);
+display:flex;
+justify-content:center;
+align-items:center;
+padding:30px;
+}
+
+.container{
+width:100%;
+max-width:900px;
+background:rgba(255,255,255,.96);
+backdrop-filter:blur(12px);
+border-radius:24px;
+padding:40px;
+box-shadow:0 25px 50px rgba(0,0,0,.18);
+animation:fade .6s ease;
+}
+
+@keyframes fade{
+from{
+opacity:0;
+transform:translateY(20px);
+}
+to{
+opacity:1;
+transform:translateY(0);
+}
+}
+
+.top{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:15px;
+flex-wrap:wrap;
+margin-bottom:30px;
+}
+
+h1{
+font-size:32px;
+color:#1e3a8a;
+}
+
+a{
+text-decoration:none;
+color:#2563eb;
+font-weight:600;
+}
+
+.progress-wrap{
+margin-bottom:25px;
+}
+
+.label{
+display:flex;
+justify-content:space-between;
+font-size:14px;
+color:#64748b;
+margin-bottom:10px;
+}
+
+.progress{
+height:10px;
+background:#e5e7eb;
+border-radius:20px;
+overflow:hidden;
+}
+
+.bar{
+height:100%;
+width:20%;
+background:linear-gradient(90deg,#2563eb,#1d4ed8);
+transition:.4s;
+}
+
+.question-box{
+background:#eff6ff;
+padding:25px;
+border-radius:18px;
+border-left:5px solid #2563eb;
+margin-bottom:22px;
+}
+
+.question-title{
+font-size:14px;
+color:#64748b;
+margin-bottom:8px;
+}
+
+#question{
+font-size:24px;
+font-weight:700;
+line-height:1.5;
+color:#0f172a;
+}
+
+textarea{
+width:100%;
+height:190px;
+padding:18px;
+border:1px solid #cbd5e1;
+border-radius:16px;
+resize:none;
+outline:none;
+font-size:15px;
+line-height:1.6;
+transition:.3s;
+}
+
+textarea:focus{
+border-color:#2563eb;
+box-shadow:0 0 0 4px rgba(37,99,235,.12);
+}
+
+.actions{
+display:flex;
+gap:12px;
+margin-top:20px;
+flex-wrap:wrap;
+}
+
+button{
+flex:1;
+min-width:180px;
+padding:16px;
+border:none;
+border-radius:14px;
+font-size:16px;
+font-weight:600;
+cursor:pointer;
+transition:.3s;
+}
+
+.primary{
+background:linear-gradient(90deg,#2563eb,#1d4ed8);
+color:white;
+}
+
+.primary:hover{
+transform:translateY(-2px);
+box-shadow:0 12px 22px rgba(37,99,235,.25);
+}
+
+.secondary{
+background:#e2e8f0;
+color:#0f172a;
+}
+
+.secondary:hover{
+background:#cbd5e1;
+}
+
+.tip{
+margin-top:18px;
+font-size:14px;
+color:#64748b;
+text-align:center;
+}
+
+.loader{
+display:none;
+margin-top:15px;
+color:#2563eb;
+font-weight:600;
+}
+
+@media(max-width:700px){
+
+.container{
+padding:24px;
+}
+
+h1{
+font-size:26px;
+}
+
+#question{
+font-size:20px;
+}
+
+button{
+width:100%;
+}
+
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div class="top">
+<h1>AI Mock Interview 🎤</h1>
+<a href="/dashboard">← Dashboard</a>
+</div>
+
+<div class="progress-wrap">
+
+<div class="label">
+<div>Question <span id="num">1</span> / 5</div>
+<div id="percent">20%</div>
+</div>
+
+<div class="progress">
+<div class="bar" id="bar"></div>
+</div>
+
+</div>
+
+<div class="question-box">
+<div class="question-title">Current Interview Question</div>
+<div id="question">{{ question }}</div>
+</div>
+
+<textarea
+id="answer"
+placeholder="Type your answer here... Explain clearly with examples, projects, and confidence."
+></textarea>
+
+<div class="loader" id="loader">Generating next question...</div>
+
+<div class="actions">
+<button class="secondary" onclick="skipQuestion()">Skip</button>
+<button class="primary" onclick="nextQ()">Next Question</button>
+</div>
+
+<div class="tip">
+Tip: Use STAR method (Situation, Task, Action, Result) for best answers.
+</div>
+
+</div>
+
+<script>
+
+let current = 1;
+
+async function nextQ(){
+
+let answer = document.getElementById("answer").value.trim();
+
+if(answer === ""){
+alert("Please type your answer first.");
+return;
+}
+
+document.getElementById("loader").style.display="block";
+
+let res = await fetch("/mock-next",{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+answer:answer,
+count:current
+})
+});
+
+let data = await res.json();
+
+document.getElementById("loader").style.display="none";
+
+if(data.finished){
+window.location.href="/results";
+return;
+}
+
+current++;
+
+updateUI(data.question);
+
+}
+
+function skipQuestion(){
+
+document.getElementById("answer").value="Skipped by user";
+nextQ();
+
+}
+
+function updateUI(question){
+
+document.getElementById("num").innerText=current;
+document.getElementById("question").innerText=question;
+document.getElementById("answer").value="";
+
+let percent = current * 20;
+
+document.getElementById("percent").innerText=percent + "%";
+document.getElementById("bar").style.width=percent + "%";
+
+}
+
+</script>
+
+</body>
+</html>

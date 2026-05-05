@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Interview Prep Bot</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Inter',sans-serif;
+}
+
+body{
+min-height:100vh;
+background:
+radial-gradient(circle at top left,#60a5fa 0%,transparent 28%),
+radial-gradient(circle at bottom right,#2563eb 0%,transparent 25%),
+linear-gradient(135deg,#0f172a,#111827,#1e3a8a);
+color:white;
+overflow-x:hidden;
+}
+
+nav{
+max-width:1350px;
+margin:auto;
+padding:22px 24px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+flex-wrap:wrap;
+gap:16px;
+}
+
+.logo{
+display:flex;
+align-items:center;
+gap:12px;
+}
+
+.logo-box{
+width:48px;
+height:48px;
+border-radius:16px;
+background:linear-gradient(135deg,#2563eb,#60a5fa);
+display:flex;
+justify-content:center;
+align-items:center;
+font-weight:800;
+font-size:18px;
+box-shadow:0 12px 25px rgba(37,99,235,.28);
+}
+
+.logo h2{
+font-size:22px;
+font-weight:800;
+}
+
+nav ul{
+list-style:none;
+display:flex;
+gap:12px;
+flex-wrap:wrap;
+}
+
+nav ul li a{
+text-decoration:none;
+color:#e2e8f0;
+padding:10px 16px;
+border-radius:12px;
+font-size:15px;
+transition:.3s;
+}
+
+nav ul li a:hover{
+background:rgba(255,255,255,0.12);
+color:white;
+}
+
+.hero{
+max-width:1350px;
+margin:auto;
+padding:40px 24px 70px;
+display:grid;
+grid-template-columns:1.1fr .9fr;
+gap:30px;
+align-items:center;
+min-height:calc(100vh - 92px);
+}
+
+.tag{
+display:inline-block;
+padding:10px 16px;
+border-radius:999px;
+background:rgba(255,255,255,0.12);
+font-size:14px;
+font-weight:600;
+margin-bottom:20px;
+}
+
+.hero h1{
+font-size:58px;
+line-height:1.12;
+font-weight:800;
+margin-bottom:18px;
+max-width:700px;
+}
+
+.hero p{
+font-size:18px;
+line-height:1.8;
+color:#dbeafe;
+max-width:620px;
+margin-bottom:28px;
+}
+
+.btn-row{
+display:flex;
+gap:14px;
+flex-wrap:wrap;
+margin-bottom:35px;
+}
+
+.btn{
+text-decoration:none;
+padding:15px 22px;
+border-radius:14px;
+font-weight:700;
+transition:.3s;
+display:inline-block;
+}
+
+.primary{
+background:linear-gradient(135deg,#2563eb,#1d4ed8);
+color:white;
+box-shadow:0 16px 28px rgba(37,99,235,.25);
+}
+
+.primary:hover{
+transform:translateY(-3px);
+}
+
+.secondary{
+border:1px solid rgba(255,255,255,0.18);
+color:white;
+background:rgba(255,255,255,0.05);
+}
+
+.secondary:hover{
+background:rgba(255,255,255,0.12);
+}
+
+.stats{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+gap:16px;
+max-width:720px;
+}
+
+.stat-box{
+background:rgba(255,255,255,0.08);
+border:1px solid rgba(255,255,255,0.08);
+backdrop-filter:blur(10px);
+padding:18px;
+border-radius:18px;
+}
+
+.stat-box h2{
+font-size:28px;
+font-weight:800;
+margin-bottom:6px;
+}
+
+.stat-box p{
+font-size:14px;
+color:#dbeafe;
+margin:0;
+line-height:1.4;
+}
+
+.preview{
+background:rgba(255,255,255,0.08);
+border:1px solid rgba(255,255,255,0.08);
+backdrop-filter:blur(14px);
+padding:24px;
+border-radius:28px;
+box-shadow:0 22px 45px rgba(0,0,0,.18);
+}
+
+.window{
+background:white;
+border-radius:22px;
+padding:22px;
+color:#0f172a;
+}
+
+.window-top{
+display:flex;
+gap:8px;
+margin-bottom:18px;
+}
+
+.dot{
+width:12px;
+height:12px;
+border-radius:50%;
+background:#e5e7eb;
+}
+
+.card{
+padding:16px;
+border-radius:18px;
+background:#f8fafc;
+margin-bottom:14px;
+}
+
+.card h3{
+font-size:16px;
+margin-bottom:8px;
+color:#1e3a8a;
+}
+
+.card p{
+font-size:14px;
+line-height:1.7;
+color:#64748b;
+}
+
+.chat-msg{
+padding:14px;
+border-radius:16px;
+font-size:14px;
+line-height:1.6;
+margin-bottom:10px;
+}
+
+.user{
+background:#2563eb;
+color:white;
+margin-left:55px;
+}
+
+.bot{
+background:#e5e7eb;
+color:#111827;
+margin-right:55px;
+}
+
+.features{
+max-width:1350px;
+margin:auto;
+padding:0 24px 70px;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+gap:18px;
+}
+
+.feature{
+background:white;
+color:#0f172a;
+padding:24px;
+border-radius:24px;
+box-shadow:0 18px 35px rgba(0,0,0,.14);
+}
+
+.feature .icon{
+font-size:30px;
+margin-bottom:14px;
+}
+
+.feature h3{
+font-size:20px;
+margin-bottom:10px;
+}
+
+.feature p{
+font-size:14px;
+line-height:1.8;
+color:#64748b;
+}
+
+@media(max-width:1050px){
+.hero{
+grid-template-columns:1fr;
+padding-top:20px;
+}
+}
+
+@media(max-width:700px){
+nav{
+padding:18px 14px;
+}
+
+.hero{
+padding:20px 14px 55px;
+}
+
+.features{
+padding:0 14px 55px;
+}
+
+.hero h1{
+font-size:38px;
+}
+
+.hero p{
+font-size:16px;
+}
+
+nav ul{
+gap:8px;
+}
+
+nav ul li a{
+padding:9px 12px;
+font-size:14px;
+}
+}
+</style>
+</head>
+<body>
+
+<nav>
+
+<div class="logo">
+<div class="logo-box">AI</div>
+<h2>Interview Bot</h2>
+</div>
+
+<ul>
+<li><a href="/">Home</a></li>
+<li><a href="/login">Login</a></li>
+<li><a href="/register">Register</a></li>
+<!-- <li><a href="/upload">Upload Resume</a></li> -->
+</ul>
+
+</nav>
+
+<section class="hero">
+
+<div>
+
+<div class="tag">🚀 Placement Ready AI Platform</div>
+
+<h1>Prepare Smarter With Your Personal AI Interview Coach</h1>
+
+<p>
+Upload your resume, generate personalized interview questions, practice mock interviews,
+compare job descriptions, and get instant AI guidance.
+</p>
+
+<div class="btn-row">
+<a href="/register" class="btn primary">Get Started Free</a>
+<a href="/login" class="btn secondary">Login</a>
+</div>
+
+<div class="stats">
+
+<div class="stat-box">
+<h2>24/7</h2>
+<p>AI Career Support</p>
+</div>
+
+<div class="stat-box">
+<h2>10x</h2>
+<p>Faster Preparation</p>
+</div>
+
+<div class="stat-box">
+<h2>100+</h2>
+<p>Interview Questions</p>
+</div>
+
+<div class="stat-box">
+<h2>ATS</h2>
+<p>Resume Matching</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="preview">
+
+<div class="window">
+
+<div class="window-top">
+<div class="dot"></div>
+<div class="dot"></div>
+<div class="dot"></div>
+</div>
+
+<div class="card">
+<h3>📄 Resume Uploaded</h3>
+<p>Detected skills: Python, Flask, SQL, APIs, AI Integration</p>
+</div>
+
+<div class="chat-msg bot">
+Tell me about a project where you solved a real problem.
+</div>
+
+<div class="chat-msg user">
+I built an AI Interview Preparation Bot using Flask + RAG.
+</div>
+
+<div class="card">
+<h3>🎯 Match Score</h3>
+<p>82% fit for Python Developer role</p>
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<section class="features">
+
+<div class="feature">
+<div class="icon">🤖</div>
+<h3>AI Chat Coach</h3>
+<p>Ask interview, coding, HR or career questions anytime.</p>
+</div>
+
+<div class="feature">
+<div class="icon">🎤</div>
+<h3>Mock Interviews</h3>
+<p>Practice realistic rounds with dynamic AI follow-up questions.</p>
+</div>
+
+<div class="feature">
+<div class="icon">📄</div>
+<h3>Resume Analysis</h3>
+<p>Upload your resume and get personalized interview prep instantly.</p>
+</div>
+
+<div class="feature">
+<div class="icon">🎯</div>
+<h3>JD Match</h3>
+<p>Compare your resume against job descriptions and improve ATS score.</p>
+</div>
+
+</section>
+
+</body>
+</html>

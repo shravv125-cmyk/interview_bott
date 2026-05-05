@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>JD Match Analyzer</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Inter,Arial,sans-serif;
+}
+
+body{
+min-height:100vh;
+background:linear-gradient(135deg,#0f172a,#1e3a8a,#3b82f6);
+display:flex;
+justify-content:center;
+align-items:center;
+padding:30px;
+}
+
+.container{
+width:100%;
+max-width:850px;
+background:rgba(255,255,255,0.96);
+backdrop-filter:blur(12px);
+padding:40px;
+border-radius:24px;
+box-shadow:0 25px 50px rgba(0,0,0,.18);
+animation:fadeIn .6s ease;
+}
+
+@keyframes fadeIn{
+from{
+opacity:0;
+transform:translateY(20px);
+}
+to{
+opacity:1;
+transform:translateY(0);
+}
+}
+
+.top{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:25px;
+flex-wrap:wrap;
+gap:15px;
+}
+
+h1{
+font-size:32px;
+color:#1e3a8a;
+}
+
+p{
+color:#64748b;
+margin-top:8px;
+line-height:1.6;
+}
+
+a{
+text-decoration:none;
+color:#2563eb;
+font-weight:600;
+}
+
+textarea{
+width:100%;
+height:260px;
+padding:18px;
+border:1px solid #dbeafe;
+border-radius:16px;
+font-size:15px;
+outline:none;
+resize:none;
+margin-top:25px;
+transition:.3s;
+line-height:1.6;
+}
+
+textarea:focus{
+border-color:#2563eb;
+box-shadow:0 0 0 4px rgba(37,99,235,.12);
+}
+
+button{
+margin-top:20px;
+width:100%;
+padding:16px;
+border:none;
+border-radius:14px;
+font-size:16px;
+font-weight:600;
+background:linear-gradient(90deg,#2563eb,#1d4ed8);
+color:white;
+cursor:pointer;
+transition:.3s;
+}
+
+button:hover{
+transform:translateY(-2px);
+box-shadow:0 12px 20px rgba(37,99,235,.25);
+}
+
+.result{
+margin-top:30px;
+background:#eff6ff;
+padding:25px;
+border-radius:18px;
+border-left:5px solid #2563eb;
+white-space:pre-line;
+line-height:1.7;
+color:#1e293b;
+}
+
+.footer{
+margin-top:20px;
+text-align:center;
+font-size:14px;
+color:#64748b;
+}
+
+@media(max-width:700px){
+
+.container{
+padding:25px;
+}
+
+h1{
+font-size:26px;
+}
+
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div class="top">
+<div>
+<h1>JD Match Analyzer 🚀</h1>
+<p>Compare your resume with any job description using AI.</p>
+</div>
+
+<a href="/dashboard">← Dashboard</a>
+</div>
+
+<form method="POST">
+
+<textarea
+name="jd"
+placeholder="Paste full Job Description here...
+
+Example:
+Looking for Python Developer with Flask, MySQL, REST APIs..."
+required></textarea>
+
+<button type="submit">Analyze Resume Match</button>
+
+</form>
+
+{% if result %}
+<div class="result">
+{{ result }}
+</div>
+{% endif %}
+
+<div class="footer">
+Powered by AI Interview Bot • Resume ATS Matching
+</div>
+
+</div>
+
+</body>
+</html>

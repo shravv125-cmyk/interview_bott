@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Interview Results</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Inter,Arial,sans-serif;
+}
+
+body{
+min-height:100vh;
+background:
+radial-gradient(circle at top left,#1d4ed8 0%,transparent 35%),
+radial-gradient(circle at bottom right,#06b6d4 0%,transparent 30%),
+linear-gradient(135deg,#0f172a,#111827,#1e293b);
+display:flex;
+justify-content:center;
+align-items:center;
+padding:30px;
+color:white;
+}
+
+.wrapper{
+width:100%;
+max-width:980px;
+background:rgba(255,255,255,0.08);
+backdrop-filter:blur(18px);
+border:1px solid rgba(255,255,255,.12);
+border-radius:28px;
+padding:38px;
+box-shadow:0 30px 60px rgba(0,0,0,.35);
+animation:fade .6s ease;
+}
+
+@keyframes fade{
+from{
+opacity:0;
+transform:translateY(20px);
+}
+to{
+opacity:1;
+transform:translateY(0);
+}
+}
+
+.top{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:20px;
+flex-wrap:wrap;
+margin-bottom:32px;
+}
+
+.title h1{
+font-size:34px;
+font-weight:800;
+margin-bottom:8px;
+}
+
+.title p{
+color:#cbd5e1;
+line-height:1.6;
+font-size:15px;
+}
+
+.badge{
+padding:10px 18px;
+border-radius:999px;
+background:rgba(16,185,129,.15);
+border:1px solid rgba(16,185,129,.35);
+color:#86efac;
+font-size:14px;
+font-weight:700;
+}
+
+.main-grid{
+display:grid;
+grid-template-columns:340px 1fr;
+gap:26px;
+margin-bottom:28px;
+}
+
+.score-card{
+background:rgba(255,255,255,.06);
+border-radius:24px;
+padding:28px;
+border:1px solid rgba(255,255,255,.08);
+}
+
+.circle{
+width:220px;
+height:220px;
+margin:auto;
+border-radius:50%;
+display:flex;
+justify-content:center;
+align-items:center;
+background:conic-gradient(#22c55e 0%, #22c55e calc(var(--score, 75) * 1%), rgba(255,255,255,.08) calc(var(--score, 75) * 1%));
+padding:14px;
+box-shadow:0 0 35px rgba(34,197,94,.18);
+}
+
+.inner{
+width:100%;
+height:100%;
+border-radius:50%;
+background:#0f172a;
+display:flex;
+justify-content:center;
+align-items:center;
+flex-direction:column;
+}
+
+.percent{
+font-size:52px;
+font-weight:800;
+color:#22c55e;
+}
+
+.sub{
+font-size:14px;
+color:#94a3b8;
+margin-top:6px;
+}
+
+.rank{
+margin-top:22px;
+text-align:center;
+font-size:15px;
+color:#e2e8f0;
+line-height:1.7;
+}
+
+.right{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:18px;
+}
+
+.metric{
+background:rgba(255,255,255,.06);
+padding:22px;
+border-radius:20px;
+border:1px solid rgba(255,255,255,.08);
+transition:.3s;
+}
+
+.metric:hover{
+transform:translateY(-5px);
+box-shadow:0 20px 30px rgba(0,0,0,.18);
+}
+
+.metric small{
+display:block;
+font-size:13px;
+color:#94a3b8;
+margin-bottom:10px;
+}
+
+.metric h2{
+font-size:34px;
+font-weight:800;
+}
+
+.metric p{
+margin-top:8px;
+font-size:14px;
+color:#cbd5e1;
+}
+
+.feedback{
+margin-top:8px;
+background:rgba(255,255,255,.05);
+padding:24px;
+border-radius:22px;
+border-left:4px solid #3b82f6;
+margin-bottom:28px;
+}
+
+.feedback h3{
+font-size:20px;
+margin-bottom:12px;
+}
+
+.feedback p{
+line-height:1.8;
+color:#e2e8f0;
+font-size:15px;
+}
+
+.actions{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:14px;
+}
+
+button{
+width:100%;
+padding:16px;
+border:none;
+border-radius:16px;
+font-size:15px;
+font-weight:700;
+cursor:pointer;
+transition:.3s;
+}
+
+.primary{
+background:linear-gradient(90deg,#2563eb,#3b82f6);
+color:white;
+}
+
+.primary:hover{
+transform:translateY(-3px);
+box-shadow:0 18px 28px rgba(37,99,235,.28);
+}
+
+.secondary{
+background:rgba(255,255,255,.08);
+color:white;
+border:1px solid rgba(255,255,255,.12);
+}
+
+.secondary:hover{
+background:rgba(255,255,255,.14);
+}
+
+.footer{
+margin-top:22px;
+text-align:center;
+font-size:13px;
+color:#94a3b8;
+}
+
+@media(max-width:900px){
+
+.main-grid{
+grid-template-columns:1fr;
+}
+
+.circle{
+width:190px;
+height:190px;
+}
+
+.right{
+grid-template-columns:1fr;
+}
+
+.title h1{
+font-size:28px;
+}
+
+}
+
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+
+<div class="top">
+
+<div class="title">
+<h1>Interview Performance 🚀</h1>
+<p>
+AI evaluated your answers across communication, technical depth and confidence.
+</p>
+</div>
+
+<div class="badge">Top Candidate Potential</div>
+
+</div>
+
+<div class="main-grid">
+
+<div class="score-card">
+
+<div class="circle">
+<div class="inner">
+<div class="percent">{{ score }}%</div>
+<div class="sub">Overall Score</div>
+</div>
+</div>
+
+<div class="rank">
+Strong profile for entry-level roles.<br>
+Keep practicing to reach elite level.
+</div>
+
+</div>
+
+<div class="right">
+
+<div class="metric">
+<small>Technical Accuracy</small>
+<h2>{{ technical }}/10</h2>
+<p>Knowledge depth and correctness.</p>
+</div>
+
+<div class="metric">
+<small>Confidence</small>
+<h2>{{ confidence }}/10</h2>
+<p>Voice clarity and self-belief.</p>
+</div>
+
+<div class="metric">
+<small>Communication</small>
+<h2>{{ communication }}/10</h2>
+<p>Structured and clear answers.</p>
+</div>
+
+<div class="metric">
+<small>Hiring Readiness</small>
+<h2>High</h2>
+<p>Good chance with preparation.</p>
+</div>
+
+</div>
+
+</div>
+
+<div class="feedback">
+<h3>AI Feedback</h3>
+<p>{{ feedback }}</p>
+</div>
+
+<div class="actions">
+
+<form action="/mock">
+<button class="primary">Practice Again</button>
+</form>
+
+<form action="/dashboard">
+<button class="secondary">Back to Dashboard</button>
+</form>
+
+</div>
+
+<div class="footer">
+Built for future hires • Consistency > Motivation
+</div>
+
+</div>
+
+</body>
+</html>

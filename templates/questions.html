@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Interview Questions</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Inter,Arial,sans-serif;
+}
+
+body{
+min-height:100vh;
+background:linear-gradient(135deg,#0f172a,#1e3a8a,#3b82f6);
+padding:35px;
+}
+
+.container{
+max-width:950px;
+margin:auto;
+background:rgba(255,255,255,.96);
+backdrop-filter:blur(12px);
+padding:40px;
+border-radius:24px;
+box-shadow:0 25px 50px rgba(0,0,0,.18);
+animation:fade .6s ease;
+}
+
+@keyframes fade{
+from{
+opacity:0;
+transform:translateY(20px);
+}
+to{
+opacity:1;
+transform:translateY(0);
+}
+}
+
+.top{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:15px;
+flex-wrap:wrap;
+margin-bottom:28px;
+}
+
+h1{
+font-size:34px;
+color:#1e3a8a;
+}
+
+.sub{
+color:#64748b;
+margin-top:8px;
+line-height:1.6;
+}
+
+a{
+text-decoration:none;
+color:#2563eb;
+font-weight:600;
+}
+
+.stats{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+gap:16px;
+margin-bottom:28px;
+}
+
+.stat{
+background:#eff6ff;
+padding:18px;
+border-radius:16px;
+text-align:center;
+}
+
+.stat h3{
+font-size:14px;
+color:#64748b;
+margin-bottom:8px;
+}
+
+.stat p{
+font-size:26px;
+font-weight:700;
+color:#1e3a8a;
+}
+
+.list{
+display:flex;
+flex-direction:column;
+gap:14px;
+}
+
+.question{
+display:flex;
+gap:15px;
+align-items:flex-start;
+background:#f8fafc;
+padding:18px;
+border-radius:16px;
+border-left:5px solid #2563eb;
+transition:.3s;
+}
+
+.question:hover{
+transform:translateX(6px);
+background:#eff6ff;
+}
+
+.num{
+min-width:34px;
+height:34px;
+border-radius:50%;
+background:#2563eb;
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:14px;
+font-weight:700;
+}
+
+.text{
+color:#0f172a;
+line-height:1.6;
+font-size:16px;
+}
+
+.actions{
+margin-top:30px;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+gap:14px;
+}
+
+button{
+width:100%;
+padding:16px;
+border:none;
+border-radius:14px;
+font-size:16px;
+font-weight:600;
+cursor:pointer;
+transition:.3s;
+}
+
+.primary{
+background:linear-gradient(90deg,#2563eb,#1d4ed8);
+color:white;
+}
+
+.primary:hover{
+transform:translateY(-2px);
+box-shadow:0 12px 22px rgba(37,99,235,.25);
+}
+
+.secondary{
+background:#e2e8f0;
+color:#0f172a;
+}
+
+.secondary:hover{
+background:#cbd5e1;
+}
+
+.footer{
+margin-top:24px;
+text-align:center;
+font-size:14px;
+color:#64748b;
+}
+
+@media(max-width:700px){
+
+body{
+padding:18px;
+}
+
+.container{
+padding:24px;
+}
+
+h1{
+font-size:28px;
+}
+
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div class="top">
+
+<div>
+<h1>Interview Questions 🎯</h1>
+<div class="sub">
+AI-generated personalized questions based on your uploaded resume and target role.
+</div>
+</div>
+
+<a href="/dashboard">← Dashboard</a>
+
+</div>
+
+<div class="stats">
+
+<div class="stat">
+<h3>Total Questions</h3>
+<p>{{ questions|length }}</p>
+</div>
+
+<div class="stat">
+<h3>Difficulty</h3>
+<p>Medium</p>
+</div>
+
+<div class="stat">
+<h3>Type</h3>
+<p>Mixed</p>
+</div>
+
+</div>
+
+<div class="list">
+
+{% for q in questions %}
+<div class="question">
+<div class="num">{{ loop.index }}</div>
+<div class="text">{{ q }}</div>
+</div>
+{% endfor %}
+
+</div>
+
+<div class="actions">
+
+<form action="/chat">
+<button class="secondary">Ask AI More Questions</button>
+</form>
+
+<form action="/mock">
+<button class="primary">Start Mock Interview</button>
+</form>
+
+</div>
+
+<div class="footer">
+Practice daily. Confidence comes from repetition.
+</div>
+
+</div>
+
+</body>
+</html>

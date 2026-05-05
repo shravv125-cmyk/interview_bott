@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Upload Resume | AI Interview Bot</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Inter,Arial,sans-serif;
+}
+
+body{
+min-height:100vh;
+background:linear-gradient(135deg,#0f172a,#1e3a8a,#3b82f6);
+display:flex;
+justify-content:center;
+align-items:center;
+padding:25px;
+overflow:hidden;
+position:relative;
+}
+
+/* floating blur circles */
+body::before,
+body::after{
+content:"";
+position:absolute;
+width:280px;
+height:280px;
+border-radius:50%;
+filter:blur(90px);
+z-index:0;
+opacity:.45;
+}
+
+body::before{
+background:#60a5fa;
+top:-80px;
+left:-80px;
+}
+
+body::after{
+background:#2563eb;
+bottom:-80px;
+right:-80px;
+}
+
+.container{
+width:100%;
+max-width:540px;
+position:relative;
+z-index:2;
+background:rgba(255,255,255,.96);
+backdrop-filter:blur(16px);
+border:1px solid rgba(255,255,255,.3);
+padding:42px;
+border-radius:28px;
+box-shadow:0 30px 60px rgba(0,0,0,.22);
+animation:fade .7s ease;
+}
+
+@keyframes fade{
+from{
+opacity:0;
+transform:translateY(30px);
+}
+to{
+opacity:1;
+transform:translateY(0);
+}
+}
+
+.logo{
+width:64px;
+height:64px;
+margin:auto;
+border-radius:18px;
+background:linear-gradient(135deg,#2563eb,#60a5fa);
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:28px;
+color:white;
+box-shadow:0 15px 25px rgba(37,99,235,.35);
+margin-bottom:18px;
+}
+
+h1{
+text-align:center;
+font-size:34px;
+font-weight:800;
+color:#0f172a;
+margin-bottom:10px;
+}
+
+.sub{
+text-align:center;
+font-size:15px;
+line-height:1.7;
+color:#64748b;
+margin-bottom:28px;
+}
+
+.alert{
+padding:14px;
+border-radius:14px;
+font-size:14px;
+font-weight:600;
+margin-bottom:18px;
+}
+
+.success{
+background:#dcfce7;
+color:#166534;
+border:1px solid #bbf7d0;
+}
+
+.error{
+background:#fee2e2;
+color:#991b1b;
+border:1px solid #fecaca;
+}
+
+label{
+display:block;
+font-size:14px;
+font-weight:700;
+margin-bottom:8px;
+color:#1e293b;
+margin-top:12px;
+}
+
+.file-box{
+border:2px dashed #cbd5e1;
+padding:18px;
+border-radius:16px;
+background:#f8fafc;
+transition:.3s;
+margin-bottom:18px;
+}
+
+.file-box:hover{
+border-color:#2563eb;
+background:#eff6ff;
+}
+
+input[type="file"]{
+width:100%;
+font-size:14px;
+color:#334155;
+}
+
+select{
+width:100%;
+padding:14px;
+border-radius:14px;
+border:1px solid #cbd5e1;
+font-size:15px;
+outline:none;
+background:white;
+transition:.3s;
+}
+
+select:focus{
+border-color:#2563eb;
+box-shadow:0 0 0 4px rgba(37,99,235,.12);
+}
+
+button{
+margin-top:24px;
+width:100%;
+padding:16px;
+border:none;
+border-radius:16px;
+background:linear-gradient(90deg,#2563eb,#1d4ed8);
+color:white;
+font-size:16px;
+font-weight:700;
+cursor:pointer;
+transition:.3s;
+box-shadow:0 15px 25px rgba(37,99,235,.22);
+}
+
+button:hover{
+transform:translateY(-2px);
+box-shadow:0 20px 30px rgba(37,99,235,.28);
+}
+
+.features{
+margin-top:24px;
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:12px;
+}
+
+.card{
+background:#f8fafc;
+padding:14px;
+border-radius:16px;
+text-align:center;
+font-size:13px;
+font-weight:600;
+color:#475569;
+border:1px solid #e2e8f0;
+}
+
+.note{
+margin-top:22px;
+text-align:center;
+font-size:13px;
+color:#94a3b8;
+line-height:1.6;
+}
+
+@media(max-width:650px){
+
+.container{
+padding:28px;
+}
+
+h1{
+font-size:28px;
+}
+
+.features{
+grid-template-columns:1fr;
+}
+
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<div class="logo">📄</div>
+
+<h1>Upload Resume</h1>
+
+<div class="sub">
+Get AI-powered interview questions, ATS match score, mock interviews and career guidance instantly.
+</div>
+
+{% if success %}
+<div class="alert success">
+{{ success }}
+</div>
+{% endif %}
+
+{% if error %}
+<div class="alert error">
+{{ error }}
+</div>
+{% endif %}
+
+<form method="POST" enctype="multipart/form-data">
+
+<label>Select Resume (PDF Only)</label>
+
+<div class="file-box">
+<input type="file" name="resume" accept=".pdf" required>
+</div>
+
+<label>Choose Target Role</label>
+
+<select name="role" required>
+<option value="">Select Role</option>
+<option>Python Developer</option>
+<option>Data Analyst</option>
+<option>AI Intern</option>
+<option>Web Developer</option>
+<option>Java Developer</option>
+<option>Machine Learning Engineer</option>
+<option>Frontend Developer</option>
+<option>Backend Developer</option>
+<option>Cloud Engineer</option>
+</select>
+
+<button type="submit">Upload & Analyze Resume</button>
+
+</form>
+
+<div class="features">
+
+<div class="card">🎯 Personalized Questions</div>
+<div class="card">📊 ATS Match</div>
+<div class="card">🎤 Mock Interview</div>
+
+</div>
+
+<div class="note">
+Your data stays private and is only used for interview preparation.
+</div>
+
+</div>
+
+</body>
+</html>
