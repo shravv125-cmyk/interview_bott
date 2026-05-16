@@ -6,14 +6,14 @@ from groq import Groq
 from typing import Any
 from utils.parser import parse_resume
 from utils.rag import create_vector_store, build_context, is_ready
-from utils.agent import route_query
+import re
+
+# load .env file
+load_dotenv()
 
 app=Flask(__name__)
 
 app.secret_key = os.getenv("SECRET_KEY")
-
-# load .env file
-load_dotenv()
 
 # get api key from .env
 client = Groq(
@@ -60,21 +60,28 @@ def home():
 def login():
 
     if request.method == "POST":
+
         email = request.form["email"]
         password = request.form["password"]
-        
 
         cursor.execute(
             "SELECT * FROM users WHERE email=%s AND password=%s",
             (email, password)
         )
 
-        user = cursor.fetchone()     #If found → returns user data If not → returns None
+        user = cursor.fetchone()
 
         if user:
-           return redirect(url_for("dashboard"))
 
-        return render_template("login.html",error="Invalid Email or Password")
+            # save logged in user
+            session["email"] = email
+
+            return redirect(url_for("dashboard"))
+
+        return render_template(
+            "login.html",
+            error="Invalid Email or Password"
+        )
 
     return render_template("login.html")
 
@@ -189,6 +196,12 @@ def register():
 @app.route("/upload", methods=["GET", "POST"])
 def upload():
 
+    # user must be logged in
+    email = session.get("email")
+
+    if not email:
+        return redirect(url_for("login"))
+
     if request.method == "POST":
 
         # get file + role
@@ -221,19 +234,20 @@ def upload():
         # save file
         file.save(filepath)
 
+        # parse resume
         clean_text, chunks = parse_resume(filepath)
 
-        # Create embeddings + vector store
+        # create vector store
         create_vector_store(chunks)
 
-        # store clean text in DB
+        # save WITH current user email
         cursor.execute(
             """
             INSERT INTO resumes
-            (filename, role, resume_text)
-            VALUES (%s, %s, %s)
+            (email, filename, role, resume_text)
+            VALUES (%s, %s, %s, %s)
             """,
-            (filename, role, clean_text)
+            (email, filename, role, clean_text)
         )
 
         db.commit()
@@ -243,34 +257,45 @@ def upload():
     return render_template("upload.html")
 
 
-@app.route("/questions",methods=["GET", "POST"])
+@app.route("/questions", methods=["GET", "POST"])
 def questions():
 
-    cursor.execute("""
-        SELECT resume_text,role
+    # current logged in user
+    email = session.get("email")
+
+    if not email:
+        return redirect(url_for("login"))
+
+    # get THIS user's latest resume
+    cursor.execute(
+        """
+        SELECT resume_text, role
         FROM resumes
+        WHERE email=%s
         ORDER BY id DESC
-        LIMIT 1   
-                   """)
-    
-    data=cursor.fetchone()
+        LIMIT 1
+        """,
+        (email,)
+    )
+
+    data = cursor.fetchone()
 
     if not data:
         return render_template(
-            "quetions.html",
+            "questions.html",
             questions=[],
-            error="No resume uploaded yet. "
+            error="No resume uploaded yet."
         )
-    
-    row = list(data)
 
-    resume_text = str(row[0])
-    role = str(row[1])
+    values: list[Any] = list(data)
 
-    prompt=f"""
-    You are a interview expert
+    resume_text = str(values[0])
+    role = str(values[1])
 
-    Base on this resume and target role,
+    prompt = f"""
+    You are an interview expert.
+
+    Based on this resume and target role,
     generate 10 personalized interview questions.
 
     Role:
@@ -281,8 +306,7 @@ def questions():
 
     Return only numbered questions.
     """
-    
-    # call Groq
+
     response = client.chat.completions.create(
         model="llama-3.1-8b-instant",
         messages=[
@@ -294,7 +318,6 @@ def questions():
         temperature=0.7
     )
 
-    # AI output text
     message = response.choices[0].message.content
 
     if message is None:
@@ -304,17 +327,30 @@ def questions():
 
     questions_list = output.split("\n")
 
-
     return render_template(
         "questions.html",
         questions=questions_list
-        )
+    )
 
 
 @app.route("/dashboard")
 def dashboard():
 
-    cursor.execute("SELECT COUNT(*) FROM resumes")
+    email = session.get("email")
+
+    if not email:
+        return redirect(url_for("login"))
+
+    # total uploads by current user
+    cursor.execute(
+        """
+        SELECT COUNT(*)
+        FROM resumes
+        WHERE email=%s
+        """,
+        (email,)
+    )
+
     row1 = cursor.fetchone()
 
     total = 0
@@ -323,19 +359,24 @@ def dashboard():
         values: list[Any] = list(row1)
         total = int(values[0])
 
-    cursor.execute("""
+    # latest role by current user
+    cursor.execute(
+        """
         SELECT role
         FROM resumes
+        WHERE email=%s
         ORDER BY id DESC
         LIMIT 1
-    """)
+        """,
+        (email,)
+    )
 
     row2 = cursor.fetchone()
 
     role = "None"
 
     if row2:
-        values2: list[Any] = list(row2)
+        values2: list[Any] = list(row2)          #converts tuple → list.
         role = str(values2[0])
 
     best = 82
@@ -349,9 +390,14 @@ def dashboard():
         role=role
     )
 
-# CHAT PAGE
 @app.route("/chat")
 def chat():
+
+    email = session.get("email")
+
+    if not email:
+        return redirect(url_for("login"))
+
     return render_template("chat.html")
 
 
@@ -384,18 +430,29 @@ def ask():
 
     # PROMPT
     prompt = f"""
-    You are an AI career coach.
+You are an AI Career Coach.
 
-    Use the resume context below to answer the user's question.
+Use the resume context to answer.
 
-    Resume Context:
-    {context}
+Resume Context:
+{context}
 
-    User Question:
-    {message}
+User Question:
+{message}
 
-    Give a clear, simple, helpful answer.
-    """
+IMPORTANT FORMAT RULES:
+- Keep answers clean and professional
+- Use short paragraphs
+- Use bullet points when needed
+- Use headings like:
+📌 Key Points
+💡 Tips
+🚀 Next Steps
+- Maximum 200 words
+- Do NOT write huge paragraphs
+
+Answer now.
+"""
 
     # GROQ CALL
     response = client.chat.completions.create(
@@ -514,12 +571,21 @@ Suggestions:
 @app.route("/mock")
 def mock():
 
-    cursor.execute("""
+    email = session.get("email")
+
+    if not email:
+        return redirect(url_for("login"))
+
+    cursor.execute(
+        """
         SELECT role, resume_text
         FROM resumes
+        WHERE email=%s
         ORDER BY id DESC
         LIMIT 1
-    """)
+        """,
+        (email,)
+    )
 
     data = cursor.fetchone()
 
@@ -532,29 +598,50 @@ def mock():
     resume_text = str(row[1])
 
     prompt = f"""
-    You are a professional interviewer.
+You are a senior technical interviewer.
 
-    Candidate Role: {role}
+Candidate Target Role:
+{role}
 
-    Resume:
-    {resume_text}
+Candidate Resume:
+{resume_text}
 
-    Ask only ONE interview question.
-    """
+TASK:
+Generate ONE realistic interview question.
+
+STRICT RULES:
+- Question MUST match the target role.
+- Use resume skills/projects if possible.
+- Avoid generic "tell me about yourself".
+- Ask technical, project-based, scenario-based, or behavioral questions relevant to the role.
+
+Examples:
+
+If role is Python Developer:
+Ask about Flask, APIs, MySQL, debugging, projects.
+
+If role is Data Analyst:
+Ask about SQL, Excel, Python, dashboards.
+
+If role is AI/ML Engineer:
+Ask about models, embeddings, RAG, vector databases.
+
+Return ONLY the question.
+"""
 
     response = client.chat.completions.create(
-        model="llama-3.1-8b-instant",
+        model="llama-3.3-70b-versatile",
         messages=[
             {
                 "role": "user",
                 "content": prompt
             }
-        ]
+        ],
+        temperature=0.4
     )
 
-    question = response.choices[0].message.content
+    question = response.choices[0].message.content or "Tell me about your latest project."
 
-    # reset session data
     session["answers"] = []
     session["questions"] = [question]
     session["mock_count"] = 1
@@ -568,16 +655,55 @@ def mock():
 @app.route("/mock-next", methods=["POST"])
 def mock_next():
 
+    # check logged in user
+    email = session.get("email")
+
+    if not email:
+        return jsonify(
+            {
+                "finished": True,
+                "question": "Please login first."
+            }
+        )
+
+    # get latest role of current user
+    cursor.execute(
+        """
+        SELECT role
+        FROM resumes
+        WHERE email=%s
+        ORDER BY id DESC
+        LIMIT 1
+        """,
+        (email,)
+    )
+
+    role_data = cursor.fetchone()
+
+    # if no resume uploaded
+    if not role_data:
+        return jsonify(
+            {
+                "finished": True,
+                "question": "Please upload your resume first."
+            }
+        )
+
+    row = list(role_data)
+    role = str(row[0])
+
+    # get frontend data
     data = request.get_json()
 
     answer = str(data["answer"])
     count = int(data["count"])
 
+    # session history
     answers = session.get("answers", [])
     questions = session.get("questions", [])
 
+    # save answer
     answers.append(answer)
-
     session["answers"] = answers
 
     # finish after 5 questions
@@ -591,29 +717,48 @@ def mock_next():
     previous_question = questions[-1]
 
     prompt = f"""
-    You are a professional interviewer.
+You are a senior technical interviewer.
 
-    Previous Question:
-    {previous_question}
+Candidate Role:
+{role}
 
-    Candidate Answer:
-    {answer}
+Previous Question:
+{previous_question}
 
-    Ask the NEXT interview question only.
-    """
+Candidate Answer:
+{answer}
+
+TASK:
+Ask the next interview question.
+
+STRICT RULES:
+- Keep questions relevant to the role
+- Increase difficulty gradually
+- Ask project-based or technical follow-up questions
+- Do not repeat previous questions
+- Do not ask generic HR questions unless relevant
+- Ask only ONE question
+
+Return ONLY the question.
+"""
 
     response = client.chat.completions.create(
-        model="llama-3.1-8b-instant",
+        model="llama-3.3-70b-versatile",
         messages=[
             {
                 "role": "user",
                 "content": prompt
             }
-        ]
+        ],
+        temperature=0.4
     )
 
     next_question = response.choices[0].message.content
 
+    if next_question is None:
+        next_question = "Explain one project you have built."
+
+    # save question
     questions.append(next_question)
 
     session["questions"] = questions
@@ -625,7 +770,6 @@ def mock_next():
             "question": next_question
         }
     )
-
 
 # RESULTS ROUTE
 @app.route("/results")
@@ -646,69 +790,80 @@ Question:
 
 Answer:
 {answers[i]}
+
 """
 
     prompt = f"""
-    Evaluate this mock interview.
+You are a strict senior interviewer from top product companies.
 
-    {combined}
+Evaluate the candidate honestly.
 
-    Give in this format:
+RULES:
+- Do not be nice just to encourage.
+- Weak answers = low score.
+- Missing technical explanation = reduce score.
+- Generic answers = reduce score.
+- Confidence issues = reduce score.
+- Communication issues = reduce score.
 
-    Score: 82
-    Technical: 8
-    Confidence: 7
-    Communication: 9
-    Feedback: Good answers but improve confidence.
-    """
+Interview Transcript:
+
+{combined}
+
+Return ONLY in this format:
+
+Score: <number between 0-100>
+Technical: <number between 0-10>
+Confidence: <number between 0-10>
+Communication: <number between 0-10>
+Hiring: <Low or Medium or High>
+Feedback: <honest detailed feedback>
+"""
 
     response = client.chat.completions.create(
-        model="llama-3.1-8b-instant",
+        model="llama-3.3-70b-versatile",
         messages=[
             {
                 "role": "user",
                 "content": prompt
             }
-        ]
+        ],
+        temperature=0.1
     )
 
     output = response.choices[0].message.content or ""
 
-    # defaults
-    score = 80
-    technical = 8
-    confidence = 8
-    communication = 8
-    feedback = "Good performance."
+    score = 0
+    technical = 0
+    confidence = 0
+    communication = 0
+    hiring = "Low"
+    feedback = "Could not generate feedback."
 
-    lines = output.split("\n")
+    score_match = re.search(r"Score:\s*(\d+)", output)
+    technical_match = re.search(r"Technical:\s*(\d+)", output)
+    confidence_match = re.search(r"Confidence:\s*(\d+)", output)
+    communication_match = re.search(r"Communication:\s*(\d+)", output)
+    hiring_match = re.search(r"Hiring:\s*(.*)", output)
+    feedback_match = re.search(r"Feedback:\s*(.*)", output)
 
-    for line in lines:
+    if score_match:
+        score = int(score_match.group(1))
 
-        low = line.lower()
+    if technical_match:
+        technical = int(technical_match.group(1))
 
-        if "score:" in low:
-            nums = ''.join(filter(str.isdigit, line))
-            if nums:
-                score = int(nums)
+    if confidence_match:
+        confidence = int(confidence_match.group(1))
 
-        elif "technical:" in low:
-            nums = ''.join(filter(str.isdigit, line))
-            if nums:
-                technical = int(nums)
+    if communication_match:
+        communication = int(communication_match.group(1))
 
-        elif "confidence:" in low:
-            nums = ''.join(filter(str.isdigit, line))
-            if nums:
-                confidence = int(nums)
+    if hiring_match:
+        hiring = hiring_match.group(1).strip()
 
-        elif "communication:" in low:
-            nums = ''.join(filter(str.isdigit, line))
-            if nums:
-                communication = int(nums)
-
-        elif "feedback:" in low:
-            feedback = line.split(":",1)[1].strip()
+    if feedback_match:
+        feedback = feedback_match.group(1).strip()
 
     return render_template(
         "results.html",
@@ -716,9 +871,9 @@ Answer:
         technical=technical,
         confidence=confidence,
         communication=communication,
+        hiring=hiring,
         feedback=feedback
     )
-
 
 if __name__ == "__main__":
     app.run(debug=True)
